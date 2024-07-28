@@ -7,6 +7,6 @@
         J     \$ Unused
         ${6:0}     \$ Selection of photo-fission method]]></content>
 	<tabTrigger>PHYS:p</tabTrigger>
-	<scope>source.mcnp - meta.card</scope>
+	<scope>source.i - meta.card</scope>
 	<description>photon particle physics</description>
 </snippet>

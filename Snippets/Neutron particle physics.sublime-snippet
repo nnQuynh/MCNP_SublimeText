@@ -10,6 +10,6 @@
         ${7:0}     \$ Treatment of nuclear interactions
         ${8:0}     \$ Treatment of nuclear elastic scattering]]></content>
 	<tabTrigger>PHYS:n</tabTrigger>
-	<scope>source.mcnp - meta.card</scope>
+	<scope>source.i - meta.card</scope>
 	<description>neutron particle physics</description>
 </snippet>

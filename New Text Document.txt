@@ -1,0 +1,17 @@
+{
+    "scope": "source.i",
+    "completions": [
+        {
+            "trigger": "def",
+            "contents": "def",
+            "kind": "keyword"
+        },
+        {
+            "trigger": "fun",
+            "annotation": "basic function",
+            "contents": "def ${1:name}($2):\n    $0\n",
+            "kind": "snippet",
+            "details": "A simple, non-<code>async</code> function definition"
+        }
+    ]
+}

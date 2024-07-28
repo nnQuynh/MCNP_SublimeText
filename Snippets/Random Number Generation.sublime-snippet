@@ -4,6 +4,6 @@
         stride = ${3:152917}         \$ Number of random numbers between source particles
         hist   = ${4:1}              \$ Starting random number which would normally start on nth history]]></content>
 	<tabTrigger>RAND</tabTrigger>
-	<scope>source.mcnp - meta.card</scope>
+	<scope>source.i - meta.card</scope>
 	<description>Random Number Generation</description>
 </snippet>

@@ -1,0 +1,322 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+# ver: 1.0
+# Last update: July-2021
+name: MCNP
+file_extensions:
+  - i
+scope: source.i
+
+variables:
+  decimal: '\+?[0-9]+\.*[0-9]*'
+  neg_decimal: '-{1}[0-9]+\.*[0-9]*'
+  blank_line: ^\s*\n
+  pos_int: '[0-9]*[1-9][0-9]*'
+
+  surface_mnemonic: (?i)\b(p|px|py|pz|so|s|sx|sy|sz|c/x|c/y|c/z|cx|cy|cz|k/x|k/y|k/z|kx|ky|kz|sq|gq|tx|ty|tz|xyzp|box|rpp|sph|rcc|rhp|hex|rec|trc|ell|wed|arb)\b
+
+
+contexts:
+  main:
+    - match: '.*'
+      scope:  entity.name.title.MCNP
+      push: cell_block
+
+
+
+  cell_block:
+    - meta_scope: cell.block.mcnp
+    - include: comments
+    
+      #          (  group1          )   (  group 2 )   ( group 3                   )      
+    - match: (?i)(^\s{0,4}[0-9]{1,8})\s+({{pos_int}})\s+({{decimal}}|{{neg_decimal}})   # cell with material
+      captures:
+        1: entity.name.cellNumber.mcnp
+        2: keyword.mat.number.mcnp
+        3: keyword.mat.density.mcnp
+
+    - match: (?i)(^\s{0,4}[0-9]{1,8})\s+(0)     # cell with void
+      captures:
+        1: entity.name.cellNumber.mcnp
+        2: keyword.mat.void.mcnp 
+
+
+    - match: (?i)(^\s{0,4}[0-9]{1,8})\s+(like)\s+([0-9]*[1-9][0-9]*)\s+(but)\b   # cell in form: j LIKE n BUT list
+      captures:
+        1: entity.name.cellNumber.mcnp
+        2: keyword.declaration.cell.parameter.mcnp
+        3: entity.name.cellNumber.mcnp
+        4: keyword.declaration.cell.parameter.mcnp
+
+
+      # cell_parameter:
+    - match: (?i)\b(mat|rho|imp|vol|pwt|ext|fcl|wwn|dxc|pd|tmp|u|trcl|lat|fill|elpt|cpsy|bflcl|unc)\b
+      scope: keyword.declaration.cell.parameter.mcnp
+
+    - match: '{{blank_line}}'
+      set: blank_line_delimiter_cell_surface
+
+
+  blank_line_delimiter_cell_surface:
+    - include: surface_block
+
+    - match: '{{blank_line}}'                        # 2 blank lines are invalid
+      scope: invalid.illegal.blankline.mcnp
+
+    - match: '[^{{blank_line}}]'
+      set: surface_block
+
+
+
+  surface_block:
+    - meta_scope: surface.block.mcnp 
+    - include: comments
+    - include: multiple_blank_line
+    
+
+
+    # 1 <= surface number <= 99 999 999
+    - match: '(^\s{0,4}0*[1-9][0-9]{0,7})\s+({{surface_mnemonic}})'      # surface no transformation
+      captures:
+        1: entity.name.surface.number.mcnp
+        2: keyword.surface.mnemonic.MCNP
+
+      #       (group1: surface number   )   (group2: TRn)   (group3: mnemonic)
+    - match: '(^\s{0,4}0*[1-9][0-9]{0,7})\s+({{pos_int}})\s+({{surface_mnemonic}})'      # surface with transformation
+      captures:
+        1: entity.name.surface.number.mcnp
+        2: variable.parameter.transformation.mcnp
+        3: keyword.surface.mnemonic.MCNP
+
+    - match: '{{blank_line}}'
+      set: blank_line_delimiter_surface_data
+
+  # multiple_blank_line:
+  #   - match: ^(\s*\n){2,}
+  #     scope: invalid.illegal.blankline.mcnp
+
+  # data_specification:
+  #   - meta_scope: data.mcnp
+
+
+  blank_line_delimiter_surface_data:
+    - include: data_block
+
+    - match: '{{blank_line}}'                        # 2 blank lines are invalid
+      scope: invalid.illegal.blankline.mcnp
+
+    - match: '[^{{blank_line}}]'
+      set: data_block
+
+
+  data_block:
+    - meta_scope: data.block.mcnp
+    - include: comments
+    - include: source_specification
+    - include: particle_type
+    - include: surface_transformation
+    - include: material
+    - include: material_thermal_scattering
+    - include: physics_data_card
+    - include: tally_specification
+    - include: problem_termination
+    - include: geometry_data_card
+    - include: variance_reduction_cards
+    - include: random_generator_card
+    - include: output_control_cards
+
+    - match: '{{blank_line}}'
+      set: blank_line_end_data_block
+
+  comments:
+    - match: \$+
+      scope: punctuation.definition.comment.MCNP
+      push:
+        - meta_scope: comment.line.MCNP
+        - match: '\n'
+          pop: true
+
+    - match:  (?i)(^\s{0,4}c\s)         # 'c' in first 5 columns and folowed by at least one black  
+      scope: punctuation.definition.comment.MCNP
+      push:
+        - meta_scope: comment.line.MCNP
+        - match: '\n'
+          pop: true
+
+  # surface_type:
+  #   - match: (?i)\b(p|px|py|pz|so|s|sx|sy|sz|c/x|c/y|c/z|cx|cy|cz|k/x|k/y|k/z|kx|ky|kz|sq|gq|tx|ty|tz|xyzp)\b
+  #     scope: keyword.definition.surface.MCNP
+
+  #   - match: (?i)\b(box|rpp|sph|rcc|rhp|hex|rec|trc|ell|wed|arb)\b
+  #     scope: keyword.definition.surface.MCNP
+
+  # Source specification
+  source_specification:
+    - match: (?i)(^\s{0,4}sdef)
+      scope: keyword.definition.source.MCNP
+
+    - match: (?i)\b(pos|x|y|z|ext|axs|rad)\b
+      scope: keyword.declaration.source.position.MCNP  
+
+    - match: (?i)\b(vec|dir)\b
+      scope: keyword.declaration.source.direction.MCNP 
+
+    - match: (?i)\b(par)\b
+      scope: keyword.declaration.source.particle.MCNP         
+
+    - match: (?i)\b(erg)\b
+      scope: keyword.declaration.source.energy.MCNP 
+
+    - match: (?i)\b(d[0-9])\b
+      scope: entity.name.source.distribution.MCNP 
+
+    - match: (?i)(^\s{0,4}si[0-9]{1,3})                 # SIn    1 <= n <= 999
+      scope: keyword.definition.source.information.MCNP
+
+    - match: (?i)(^\s{0,4}sp[0-9]{1,3})                 # SPn    1 <= n <= 999
+      scope: keyword.definition.source.probability.MCNP
+
+    - match: (?i)(^\s{0,4}sb[0-9]{1,3})                 # SBn    1 <= n <= 999
+      scope: keyword.definition.source.bias.MCNP
+
+  particle_type:
+    - match: (?i)(:|=)(p|e|n)
+      #scope: variable.parameter.source.particle.type.MCNP
+      captures:
+        2: variable.parameter.source.particle.type.MCNP
+
+  # unit_modifier:
+  #   - match: (\*)
+  #     scope: constant.numeric
+
+
+
+  cell_transformation:
+    - match: (?i)(trcl)
+      scope: keyword.transformation.surface.MCNP
+
+  material:
+    - include: material_thermal_scattering
+
+    - match: (?i)\b(m)([0-9]+)\b
+      captures:
+        1: keyword.material.definition.MCNP
+        2: keyword.material.number.MCNP      #constant.numeric.integer
+
+
+
+
+
+  # tally specification
+  tally_specification:
+    - include: fmesh
+
+    - match: (?i)(^\s{0,4}fc[0-9]{1,9})(.*)           # tally comment
+      scope:  entity.name.tally.comment.MCNP
+
+
+
+    - match: (?i)(^\s{0,4})(\*?|\+?)(f[0-9]{1,9})
+      captures:
+        2: constant.numeric
+        3: keyword.tally.definition.MCNP  
+  
+
+    - match: (?i)(^\s{0,4}fm)([0-9]+)    
+      scope: keyword.tally.multiplier.MCNP    
+
+    - match: (?i)(^\s{0,4}e)([0-9]+)    
+      scope: keyword.tally.energy.MCNP    
+
+    - match: (?i)(^\s{0,4}sd)([0-9]+)    
+      scope: keyword.tall  y.segment_division.MCNP   
+
+    
+
+  ## fmesh
+  fmesh:
+    - match: (?i)(^\s{0,4}fmesh([0-9]*4))    # fmesh
+      scope: keyword.tally.fmesh.MCNP  
+
+    - match: (?i)(geom)(\s*=\s*)(xyz|rec|rzt|cyl)
+      captures:
+        1: keyword.declaration.tally.fmesh.geometry.MCNP  
+        3: variable.parameter.tally.fmesh.geometry.MCNP  
+
+    - match: (?i)(origin|axs|vec|imesh|iints|jmesh|jints|kmesh|kints|tnorm|factor|out|tr)(\s*=\s*)  # last group: distinct to TR transformation card
+      captures: 
+        1: keyword.declaration.tally.fmesh.other.MCNP 
+
+
+
+  material_thermal_scattering:
+    - include: SaB
+
+    - match: (?i)\b(mt)([0-9]+)\b
+      captures:
+        1: keyword.declaration.material.thermal_scattering.MCNP
+        2: keyword.declaration.material.thermal_scattering.MCNP
+
+  # S(alpha,bea)
+  SaB:
+    - include: SaB2_ENDFVIII.0
+
+  SaB2_ENDFVIII.0:
+    - match: (?i)(al-27|d-d2o|fe-56|grph|grph10|grph30|h-h2o|h-luci|h-poly|h-yh2|h-zrh|o-d2o|)(.40t)
+      scope: variable.parameter.crossSection.SaB.MCNP
+
+
+  problem_termination:
+    - match: (?i)^\s{0,4}(nps)
+      scope: keyword.problem.termination.mcnp
+    - match: (?i)^\s{0,4}(ctme)
+      scope: keyword.problem.termination.mcnp
+    - match: (?i)^\s{0,4}(stop)
+      scope: keyword.problem.termination.mcnp
+
+  geometry_data_card:
+    - match: (?i)^\s{0,4}(vol)
+      scope: keyword.geometry.data.mcnp
+
+    - match: (?i)^\s{0,4}(area)
+      scope: keyword.geometry.data.mcnp
+
+    - match: (?i)(^\s{0,4})(\*?)(tr|trcl)([0-9]{1,3})\b
+      captures:
+        2: constant.numeric.unit.modifier.mcnp
+        3: keyword.geometry.data.card.mcnp
+        4: variable.parameter.data.number.mcnp
+
+  physics_data_card:
+    - match: (?i)(^\s{0,4}mode)(.*)
+      captures:
+        1: keyword.physics.card.mode.MCNP
+        2: variable.parameter.source.particle.type.MCNP
+
+    - match: (?i)(^\s{0,4})(phys|cut|tmp|thtme|mphys|unc|cosyp|cosy|field|field)\b
+      scope: keyword.physics.card.others.MCNP
+
+  variance_reduction_cards:
+    - match: (?i)(^\s{0,4})(imp|var|wwe|wwt|wwp|wwg|wwge|wwgt|esplt|ext|fcl|dxt)\b
+      scope: keyword.variance-reduction-cards.mcnp
+
+  random_generator_card:
+    - match: (?i)(^\s{0,4})(rand)\b
+      scope: keyword.random.card.mcnp
+
+    - match: (?i)\b(gen|seed|stride|hist)\b
+      scope: keyword.declaration.random.properties.mcnp
+
+  output_control_cards:
+    - match: (?i)(^\s{0,4})(print|talnp|prdmp)\b
+      scope: keyword.output-control-cards.mcnp   
+
+
+
+  blank_line_end_data_block:
+    # - match: '{{blank_line}}'                        # 2 blank lines are invalid
+    #   scope: invalid.illegal.blankline.mcnp
+
+    - match: '[^{{blank_line}}]'
+      scope: invalid.illegal.blankline.mcnp
