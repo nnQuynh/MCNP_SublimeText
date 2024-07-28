@@ -6,7 +6,7 @@
 name: MCNP
 file_extensions:
   - i
-scope: source.i
+scope: source.mcnp
 
 variables:
   decimal: '\+?[0-9]+\.*[0-9]*'
@@ -20,7 +20,7 @@ variables:
 contexts:
   main:
     - match: '.*'
-      scope:  entity.name.title.MCNP
+      scope:  entity.name.title.mcnp
       push: cell_block
 
 

@@ -1,5 +1,5 @@
 {
-    "scope": "source.i data.block.mcnp",
+    "scope": "source.mcnp data.block.mcnp",
     "completions": [
         {
             "trigger": "mat_air",
