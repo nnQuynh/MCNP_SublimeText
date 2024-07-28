@@ -1,0 +1,15 @@
+<snippet>
+	<content><![CDATA[phys:n  ${1:100}   \$ Upper limit neutron energy [MeV]
+        ${2:0}     \$ Analog energy limit
+        ${3:0}     \$ Unresolved resonance range prob. table treatment
+        J J J \$ Unused
+        ${4:0}     \$ Light/heavy ion recoil and n-capture algorithm
+        ${5:-1}    \$ Table-based physics cutoff and memory reduction
+        J J   \$ Unused
+        ${6:1}     \$ Secondary photon production
+        ${7:0}     \$ Treatment of nuclear interactions
+        ${8:0}     \$ Treatment of nuclear elastic scattering]]></content>
+	<tabTrigger>PHYS:n</tabTrigger>
+	<scope>source.mcnp - meta.card</scope>
+	<description>neutron particle physics</description>
+</snippet>

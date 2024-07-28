@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[rand    gen    = ${1:1}              \$ Random number generator type
+        seed   = ${2:19073486328125} \$ Random number generator seed
+        stride = ${3:152917}         \$ Number of random numbers between source particles
+        hist   = ${4:1}              \$ Starting random number which would normally start on nth history]]></content>
+	<tabTrigger>RAND</tabTrigger>
+	<scope>source.mcnp - meta.card</scope>
+	<description>Random Number Generation</description>
+</snippet>

@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[cut:${1:n}   ${2:t}        \$ Time cutoff [shakes]
+        ${3:e}        \$ Lower energy cutof [MeV]
+        ${4:wc1,wc2}  \$ Weight cutoffs
+        ${5:swtm}     \$ Minimum source weight]]></content>
+	<tabTrigger>CUT</tabTrigger>
+	<scope>source.mcnp - meta.card</scope>
+	<description>physics cutoff cards</description>
+</snippet>

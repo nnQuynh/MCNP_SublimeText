@@ -1,0 +1,12 @@
+<snippet>
+	<content><![CDATA[phys:p  ${1:100}   \$ Upper limit photon energy [MeV]
+        ${2:0}     \$ Generation of e in MODE p,e, or bremsstrahlung in MODE p
+        ${3:0}     \$ Coherent (Thomson) scattering
+        ${4:0}     \$ Photonuclear particle production
+        ${5:0}     \$ Photon Doppler energy broadening
+        J     \$ Unused
+        ${6:0}     \$ Selection of photo-fission method]]></content>
+	<tabTrigger>PHYS:p</tabTrigger>
+	<scope>source.mcnp - meta.card</scope>
+	<description>photon particle physics</description>
+</snippet>
